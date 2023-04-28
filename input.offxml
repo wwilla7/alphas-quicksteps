@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SMIRNOFF version="0.3" aromaticity_model="OEAroModel_MDL">
+    <Author>The Open Force Field Initiative</Author>
+    <Date>2023-04-28</Date>
+    <vdW version="0.3" potential="Lennard-Jones-12-6" combining_rules="Lorentz-Berthelot" scale12="0.0" scale13="0.0" scale14="0.5" scale15="1.0" cutoff="9.0 * angstrom" switch_width="1.0 * angstrom" method="cutoff">
+        <Atom smirks="[#1:1]" epsilon="1.0 * mole**-1 * kilocalorie" id="n0" rmin_half="1.0 * angstrom"></Atom>
+        <Atom smirks="[#6:1]" epsilon="1.0 * mole**-1 * kilocalorie" id="n1" rmin_half="1.0 * angstrom"></Atom>
+        <Atom smirks="[#7:1]" epsilon="1.0 * mole**-1 * kilocalorie" id="n2" rmin_half="1.0 * angstrom"></Atom>
+        <Atom smirks="[#8:1]" epsilon="1.0 * mole**-1 * kilocalorie" id="n3" rmin_half="1.0 * angstrom"></Atom>
+    </vdW>
+</SMIRNOFF>
