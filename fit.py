@@ -31,18 +31,31 @@ logger = logging.getLogger()
 
 @dataclass
 class AMol:
+    """
+    A molecule with ESP data
+    """
+
     data_path: str
     off_ff: ForceField
     pol_handler: str = "MPIDPolarizability"
 
     @property
     def mapped_smiles(self) -> str:
+        """
+        Returns the mapped smiles string of the molecule
+        """
+
         with open(os.path.join(self.data_path, "molecule.smi"), "r") as f:
             smi = f.read()
         return smi
 
     @property
     def coordinates(self) -> np.ndarray:
+        """
+        Returns the coordinates of the molecule
+        Units: bohr
+        """
+
         crds = (
             Q_(
                 np.load(os.path.join(self.data_path, "coordinates.npy")),
@@ -55,6 +68,11 @@ class AMol:
 
     @property
     def grid(self) -> np.ndarray:
+        """
+        Returns the grid points
+        Units: bohr
+        """
+
         grid = (
             Q_(np.load(os.path.join(self.data_path, "grid.npy")), ureg.angstrom)
             .to(ureg.bohr)
@@ -65,6 +83,11 @@ class AMol:
 
     @property
     def data_esp(self) -> Dict[str, Dict[str, np.ndarray]]:
+        """
+        Returns all ESP data for polarizability fitting
+        Units: e / bohr
+        """
+
         data = {}
 
         grid_espi_0 = Q_(
@@ -95,6 +118,9 @@ class AMol:
 
     @property
     def polarizability_smirks(self) -> List[str]:
+        """
+        Returns the SMARTS patterns of the polarizability parameters
+        """
         mol = Molecule.from_mapped_smiles(self.mapped_smiles)
         parameters = self.off_ff.label_molecules(mol.to_topology())[0]
         smirks = [v._smirks for _, v in parameters[self.pol_handler].items()]
@@ -102,7 +128,12 @@ class AMol:
         return smirks
 
 
-def quality_of_fit(mol: AMol) -> float:
+def quality_of_fit(mol: AMol) -> Dict[str, float]:
+    """
+    Returns a dictionary of the 
+    quality of fit (RRMS) of the polarizability parameters
+    """
+
     crds = mol.coordinates
     grid = mol.grid
 
@@ -112,8 +143,8 @@ def quality_of_fit(mol: AMol) -> float:
     offmol = Molecule.from_mapped_smiles(mol.mapped_smiles)
     parameters = mol.off_ff.label_molecules(offmol.to_topology())[0]
     alphas = np.array(
-        [
-            v.polarizabilityXX.to("a0**3").magnitude
+        [Q_(v.epsilon.magnitude, "angstrom**3").to("a0**3").magnitude
+            # v.polarizabilityXX.to("a0**3").magnitude
             for _, v in parameters[mol.pol_handler].items()
         ]
     )
@@ -248,3 +279,17 @@ if __name__ == "__main__":
 
     logger.info(f"Saving polarzabilities in the parameter field of `id`.")
     ff.to_file(os.path.join(cwd, "output.offxml"))
+
+    ## check rrms
+
+    all_rrms = []
+    
+    for idx, mol in enumerate(molecules):
+        confs = glob(os.path.join(mol, "conf*"))
+        amols = [AMol(conf, ff, pol_handler) for conf in confs]
+        rrms_this_mol = [quality_of_fit(mol=amol) for amol in amols]
+        all_rrms.extend([list(r.values()) for r in rrms_this_mol])
+
+    logger.info(f"RRMS: {np.mean(all_rrms):.5f}")
+
+
