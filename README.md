@@ -13,7 +13,7 @@ oe_process.py: A script to process the above reference data into a format that c
 
 expt_pol.csv: A CSV file containing the processed reference data.
 
-fit.py: Fit atomic polarizabilities using SMARTS patterns to QM ESP data.
+pfit.py: Fit atomic polarizabilities using SMARTS patterns to QM ESP data.
 
 molpol.py A script to calculate molecular polarizabilities from fitted atomic polarizabilities. Including a quick linear regression to reference data with scikit-learn.
 
