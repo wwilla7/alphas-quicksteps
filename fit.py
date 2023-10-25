@@ -204,7 +204,7 @@ def fit(mol: AMol, ndim: int, positions: Dict[str, int]):
             logger.debug(f"Processing {smirks_k}...")
 
             Cik = D_ijE[alphas_k].sum(axis=0)
-            B[positions[smirks_k]] += np.dot(Cik, vdiff)
+            B[positions[smirks_k]] += np.dot(Cik, vdiff).item()
 
             for l, (smirks_l, alphas_l) in enumerate(param_dict.items()):
                 if k > l:
